@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صيدليات د/ محمود أحمد مصطفى</title>
+
+<!-- خط عربي Cairo -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<!-- مكتبات Three.js و GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* إعدادات عامة */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+body{background:#050816;color:#fff;overflow-x:hidden;direction:rtl;}
+canvas{position:fixed;top:0;left:0;z-index:-1;} /* خلفية Particles */
+
+/* الهيدر */
+header{
+  position:fixed; /* يثبت في الأعلى */
+  width:100%;
+  top:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:25px 60px;
+  background:rgba(0,0,0,0.3);
+  backdrop-filter:blur(12px);
+  z-index:1000;
+}
+nav a{margin-left:25px;text-decoration:none;color:#fff;transition:.3s;}
+nav a:hover{color:#00e0ff}
+
+/* قسم الهيرو */
+.hero{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  perspective:1000px; /* لتأثير 3D عند Hover */
+}
+.hero h1{
+  font-size:60px;
+  font-weight:800;
+  line-height:1.1;
+  background:linear-gradient(90deg,#00e0ff,#8a2be2);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-align:center;
+  cursor:pointer;
+  transition:transform 0.3s ease;
+}
+.hero p{margin-top:20px;opacity:.7;font-size:20px;}
+.btn{
+  margin-top:15px;
+  padding:12px 35px;
+  border:none;
+  border-radius:50px;
+  background:linear-gradient(90deg,#00e0ff,#8a2be2);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+.btn:hover{transform:scale(1.1)}
+
+/* أقسام الموقع */
+section{padding:150px 80px;}
+.section-title{font-size:50px;margin-bottom:50px;text-align:center;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;}
+.card{
+  background:rgba(13,19,38,0.85);
+  padding:40px;
+  border-radius:25px;
+  transition:.4s;
+  transform-style:preserve-3d; /* للسماح بالتحريك ثلاثي الأبعاد */
+}
+.card:hover{box-shadow:0 25px 50px rgba(0,224,255,0.3);}
+.footer{text-align:center;padding:40px;background:#03050d;opacity:.6;}
+
+/* استجابة الشاشات الصغيرة */
+@media(max-width:768px){
+  .hero h1{font-size:40px}
+  section{padding:100px 20px}
+  header{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- Canvas لخلفية Particles -->
+<canvas id="bg"></canvas>
+
+<!-- الهيدر -->
+<header>
+<h2>صيدليات د/ محمود أحمد مصطفى</h2>
+<nav>
+<a href="#home">الرئيسية</a>
+<a href="#services">الخدمات</a>
+<a href="#products">المنتجات</a>
+<a href="#offers">العروض</a>
+</nav>
+</header>
+
+<!-- قسم الهيرو -->
+<section class="hero" id="home">
+<h1 id="heroTitle">صيدليات د/ محمود أحمد مصطفى ترحب بكم</h1>
+<p>أفضل العروض والخدمات لمنتجات الصحة والجمال.</p>
+<button class="btn" id="exploreBtn">استعرض المنتجات</button>
+</section>
+
+<!-- خدمات الموقع -->
+<section id="services">
+<h2 class="section-title">خدماتنا</h2>
+<div class="grid">
+<div class="card"><h3>استشارات طبية</h3><p>استشارات ذكية ووصفات دقيقة.</p></div>
+<div class="card"><h3>توصيل سريع</h3><p>توصيل الأدوية إلى باب منزلك بسرعة.</p></div>
+<div class="card"><h3>دعم 24/7</h3><p>متواجدون دائمًا لدعم صحتك.</p></div>
+</div>
+</section>
+
+<!-- المنتجات -->
+<section id="products">
+<h2 class="section-title">المنتجات</h2>
+<div class="grid">
+<div class="card" onclick="addToCart('فيتامينات')"><h3>فيتامينات</h3><button class="btn">عرض</button></div>
+<div class="card" onclick="addToCart('العناية بالبشرة')"><h3>العناية بالبشرة</h3><button class="btn">عرض</button></div>
+<div class="card" onclick="addToCart('أدوية')"><h3>الأدوية</h3><button class="btn">عرض</button></div>
+<div class="card" onclick="addToCart('إكسسوارات')"><h3>إكسسوارات</h3><button class="btn">عرض</button></div>
+</div>
+</section>
+
+<!-- العروض الخاصة -->
+<section id="offers">
+<h2 class="section-title">العروض الخاصة</h2>
+<div class="grid">
+<div class="card"><h3>عرض الفيتامينات</h3><p>خصم 20% على جميع الفيتامينات.</p></div>
+<div class="card"><h3>العناية بالبشرة</h3><p>اشترِ 2 واحصل على 1 مجانًا.</p></div>
+<div class="card"><h3>الأدوية</h3><p>خصم على الأدوية الشائعة.</p></div>
+<div class="card"><h3>الإكسسوارات</h3><p>توصيل مجاني عند الشراء.</p></div>
+</div>
+</section>
+
+<div class="footer">© 2026 صيدليات د/ محمود أحمد مصطفى</div>
+
+<script>
+// ================================
+// إعداد Three.js لخلفية Particles
+// ================================
+let scene=new THREE.Scene(); // إنشاء مشهد
+let camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000); // إعداد الكاميرا
+let renderer=new THREE.WebGLRenderer({canvas:document.getElementById("bg"),antialias:true}); // إعداد Renderer
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+let particles=[]; // مصفوفة لتخزين الجسيمات
+for(let i=0;i<400;i++){
+  let geom=new THREE.SphereGeometry(Math.random()*0.05,8,8); // حجم الجسيم
+  let mat=new THREE.MeshBasicMaterial({color:0x00e0ff,transparent:true,opacity:0.5}); // اللون والشفافية
+  let sph=new THREE.Mesh(geom,mat); // إنشاء Mesh
+  sph.position.set(Math.random()*20-10,Math.random()*10-5,Math.random()*-10); // موضع عشوائي
+  scene.add(sph); // إضافته للمشهد
+  particles.push(sph);
+}
+camera.position.z=5; // بعد الكاميرا
+
+// تأثير حركة النص مع الماوس
+document.addEventListener('mousemove',(e)=>{
+  let hero=document.getElementById("heroTitle");
+  let x=(e.clientX/window.innerWidth-0.5)*20;
+  let y=(e.clientY/window.innerHeight-0.5)*20;
+  hero.style.transform=`rotateX(${y}deg) rotateY(${x}deg)`;
+});
+
+// انيميشن قوي لنص الهيرو عند الدخول
+let heroTitle=document.getElementById("heroTitle");
+gsap.from(heroTitle,{duration:2, y:-50, opacity:0, scale:0.8, ease:"elastic.out(1,0.5)"});
+
+// Hover effect للنص
+heroTitle.addEventListener("mouseenter",()=>{
+  gsap.to(heroTitle,{scale:1.05, duration:0.3, color:"#00e0ff"});
+});
+heroTitle.addEventListener("mouseleave",()=>{
+  gsap.to(heroTitle,{scale:1, duration:0.3, color:"transparent"});
+});
+
+// وظيفة التحديث لكل Frame للـ Particles
+function animate(){
+  requestAnimationFrame(animate);
+  particles.forEach(p=>{
+    p.position.z+=0.02; // تحريك الجسيم للأمام
+    if(p.position.z>5)p.position.z=-10; // إعادة وضع الجسيم للخلف
+    p.rotation.x+=0.03;
+    p.rotation.y+=0.01;
+  });
+  renderer.render(scene,camera);
+}
+animate();
+
+// GSAP Scroll Reveal لكل بطاقة
+gsap.utils.toArray(".card").forEach(c=>{
+  gsap.from(c,{scrollTrigger:{trigger:c,start:"top 85%"},y:100,opacity:0,duration:1.2,ease:"power3.out"});
+});
+
+// Hero Text Animation
+gsap.from(".hero p",{y:50,opacity:0,duration:1,delay:.5});
+gsap.from("#exploreBtn",{scale:0,opacity:0,duration:1,delay:1});
+
+// Cart Static عبر LocalStorage
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+function addToCart(item){
+  cart.push(item);
+  localStorage.setItem("cart",JSON.stringify(cart));
+  updateCart();
+}
+function updateCart(){alert("تمت إضافة "+cart.join(", "));}
+document.getElementById("exploreBtn").onclick=()=>{
+  window.scrollTo({top:document.getElementById("products").offsetTop,behavior:"smooth"});
+}
+
+// 3D Parallax Hover لكل بطاقة
+document.querySelectorAll(".card").forEach(card=>{
+  card.addEventListener("mousemove",(e)=>{
+    let rect=card.getBoundingClientRect();
+    let x=(e.clientX-rect.left)/rect.width;
+    let y=(e.clientY-rect.top)/rect.height;
+    card.style.transform=`rotateY(${(x-0.5)*20}deg) rotateX(${(0.5-y)*20}deg) scale(1.05)`;
+  });
+  card.addEventListener("mouseleave",()=>{
+    card.style.transform="rotateX(0deg) rotateY(0deg) scale(1)";
+  });
+});
+
+// Hover + Glow لكل زر "عرض"
+document.querySelectorAll(".card .btn").forEach(btn=>{
+  btn.addEventListener("mousemove",(e)=>{
+    let rect=btn.getBoundingClientRect();
+    let x=(e.clientX-rect.left)/rect.width;
+    let y=(e.clientY-rect.top)/rect.height;
+    btn.style.transform=`translateZ(10px) rotateX(${(0.5-y)*15}deg) rotateY(${(x-0.5)*15}deg) scale(1.05)`;
+    btn.style.boxShadow="0 8px 20px rgba(0,224,255,0.6)";
+  });
+  btn.addEventListener("mouseleave",()=>{
+    btn.style.transform="translateZ(0px) rotateX(0deg) rotateY(0deg) scale(1)";
+    btn.style.boxShadow="none";
+  });
+});
+
+// 3D Floating Effect ديناميكي لكل بطاقة منتجات
+document.querySelectorAll("#products .card").forEach(card=>{
+  let floatY = Math.random() * 10 - 5;
+  let floatX = Math.random() * 10 - 5;
+  let floatAngle = Math.random() * 20 - 10;
+  
+  function floatAnimation(){
+    let t = Date.now() * 0.002;
+    card.style.transform = `translateX(${Math.sin(t + floatX)}px) translateY(${Math.sin(t + floatY)}px) rotateZ(${Math.sin(t + floatAngle)}deg)`;
+    requestAnimationFrame(floatAnimation);
+  }
+  floatAnimation();
+
+  card.addEventListener("mousemove",(e)=>{
+    let rect=card.getBoundingClientRect();
+    let x=(e.clientX-rect.left)/rect.width;
+    let y=(e.clientY-rect.top)/rect.height;
+    card.style.transform += ` rotateY(${(x-0.5)*20}deg) rotateX(${(0.5-y)*20}deg) scale(1.05)`;
+  });
+  card.addEventListener("mouseleave",()=>{
+    card.style.transform = ""; // تعود للحركة العائمة فقط
+  });
+});
+</script>
+
+</body>
+</html>
